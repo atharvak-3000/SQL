@@ -1,305 +1,240 @@
-use college;
-create table student(
-	roll_no INT,
-    name varchar(30),
-    age int
+-- ======================================
+-- SQL Tutorial Script 
+-- Author: Atharva Kale
+-- Purpose: Practice and reference SQL concepts
+-- ======================================
+
+-- ========================
+-- DATABASE & BASIC TABLES
+-- ========================
+-- Use the 'college' database (make sure it exists)
+create database college;
+USE college;
+
+-- Creating a simple 'student' table
+CREATE TABLE student (
+    roll_no INT,
+    name VARCHAR(30),
+    age INT
 );
 
-insert into student
-values
-(101,"a",24),
-(102,"b",25);
+-- Inserting sample data into 'student'
+INSERT INTO student VALUES
+(101, "a", 24),
+(102, "b", 25);
 
-select * from student;
+SELECT * FROM student;
 
-create database if not exists student;
-create database if not exists insta;
+-- ========================
+-- DATABASE COMMANDS
+-- ========================
+CREATE DATABASE IF NOT EXISTS student;
+CREATE DATABASE IF NOT EXISTS insta;
 
-drop database if exists student;
+DROP DATABASE IF EXISTS student;
+DROP DATABASE IF EXISTS insta;
 
-drop database if exists insta;
+SHOW DATABASES;
 
-show databases;
-use college;
-show tables;
+USE college;
+SHOW TABLES;
 
--- table queries --
--- create table-- 
-use insta;
-create table user(
-	id int primary key,
-    age int,
-    name varchar(10) not null,
-    email varchar(20) unique,
-    followers int default 0,
-    following int ,
-    constraint age_check check(age>=13)
+-- ========================
+-- INSTA DATABASE TABLES
+-- ========================
+USE insta;
+
+-- Create 'user' table
+CREATE TABLE user (
+    id INT PRIMARY KEY,
+    age INT,
+    name VARCHAR(10) NOT NULL,
+    email VARCHAR(20) UNIQUE,
+    followers INT DEFAULT 0,
+    following INT,
+    CONSTRAINT age_check CHECK(age >= 13)
 );
 
-create table post(
-	id int primary key,
-    content varchar(100),
-    user_id int,
-    foreign key (user_id) references user(id)
+-- Create 'post' table
+CREATE TABLE post (
+    id INT PRIMARY KEY,
+    content VARCHAR(100),
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
+-- Insert into 'user' table
+INSERT INTO user (id, age, name, email, followers, following) VALUES
+(1, 14, "adam", "adam@yahoo.in", 123, 24),
+(2, 15, "bob", "bob123@gmail.com", 123, 35),
+(3, 16, "case", "caeit@gmail.com", 200, 5),
+(4, 17, "john", "john2004@gmail.com", 13, 30);
 
-insert into user
-(id,age,name,email,followers,following)
-values
-(1,14,"adam","adam@yahoo.in",123,24),
-(2,15,"bob","bob123@gmail.com",123,35),
-(3,16,"case","caeit@gmail.com",200,5),
-(4,17,"john","john2004@gmail.com",13,30);
+-- Attempting duplicate ID would give error (commented out)
+-- INSERT INTO user (id, age, name) VALUES (2, 20, "random");
 
+-- Select queries
+SELECT id, age FROM user;
+SELECT * FROM user;
+SELECT DISTINCT age FROM user;
 
--- insert into user
--- (id,age,name)
--- values
--- (2,20,"random"); gives error as we are trying to duplicate value for id
+-- Insert into 'post'
+INSERT INTO post (id, content, user_id) VALUES
+(1, "hello world", 3),
+(2, "byebyebye", 2),
+(3, "foolforyou", 3);
 
--- select -- 
-select id,age from user;
-select * from user;
--- unique data
-select distinct age from user;
+SELECT * FROM post;
 
--- entering data into post table
-insert into post
-(id,content,user_id)
-values
-(1,"hello world",3),
-(2,"byebyebye",2),
-(3,"foolforyou",3);
+-- ========================
+-- FILTERING AND CONDITIONS
+-- ========================
+SELECT * FROM user WHERE followers >= 200;
 
-select * from post;
+SELECT name, age, followers FROM user
+WHERE age > 15 AND followers > 100;
 
-use insta;
-select *
-from user
-where followers >=200;
+SELECT name, age, followers FROM user
+WHERE age > 15 OR followers > 200;
 
--- operators
-select name,age,followers
-from user
-where age>15 AND followers>100;
+SELECT name, age, followers FROM user
+WHERE age BETWEEN 15 AND 17;
 
-select name,age,followers
-from user
-where age>15 OR followers>200;
+SELECT name, age, followers FROM user
+WHERE email IN ("adam@yahoo.in", "caeit@gmail.com");
 
-select name,age,followers
-from user
-where age between 15 and 17;
+SELECT name, age, followers FROM user
+WHERE email NOT IN ("adam@yahoo.in", "caeit@gmail.com");
 
+-- ========================
+-- LIMIT & ORDER BY
+-- ========================
+SELECT * FROM user LIMIT 2;
 
-select name,age,followers
-from user
-where email in ("adam@yahoo.in","caeit@gmail.com");
+SELECT * FROM user ORDER BY age DESC;
 
-select name,age,followers
-from user
-where email  not in ("adam@yahoo.in","caeit@gmail.com");
+-- ========================
+-- AGGREGATE FUNCTIONS
+-- ========================
+SELECT MAX(age) FROM user;
+SELECT COUNT(age) FROM user WHERE age >= 15;
+SELECT MIN(age) FROM user;
+SELECT AVG(age) FROM user;
+SELECT SUM(followers) FROM user;
 
--- Limit
-select * from user
-limit 2;
+-- GROUP BY & HAVING
+SELECT age, MAX(followers) FROM user GROUP BY age;
 
--- order by
-select  * from user
-order by age desc;
+SELECT age, MAX(followers) FROM user
+GROUP BY age
+HAVING MAX(followers) >= 100;
 
--- aggreagate functions
-select max(age)
-from user;
+SELECT age, MAX(followers) FROM user
+WHERE age > 14
+GROUP BY age
+HAVING MAX(followers) >= 100
+ORDER BY age DESC;
 
-select count(age)
-from user
-where age>=15;
+-- ========================
+-- UPDATE & DELETE
+-- ========================
+UPDATE user SET followers = 600 WHERE age = 16;
 
-select min(age)
-from user;
+-- If MySQL throws error due to safe updates, run:
+-- SET sql_safe_updates = 0;
 
-select avg(age)
-from user;
+DELETE FROM user WHERE age = 14;
 
-select sum(followers)
-from user;
+-- ========================
+-- ALTER TABLE OPERATIONS
+-- ========================
+ALTER TABLE user ADD COLUMN city VARCHAR(20) DEFAULT "mumbai";
 
--- Group By
-select age,max(followers)
-from user
-group by age;
+ALTER TABLE user DROP age;
 
--- having clause
-select age,max(followers)
-from user
-group by age
-having max(followers)>=100;
+ALTER TABLE user RENAME TO instauser;
+ALTER TABLE instauser RENAME TO user;
 
--- general order
-select age,max(followers)
-from user
-where age>14
-group by age
-having max(followers)>=100
-order by age desc;
+ALTER TABLE user CHANGE COLUMN followers subs INT DEFAULT 0;
+ALTER TABLE user MODIFY subs INT DEFAULT 5;
 
--- Table Queries
--- UPDATE(rows)
-update user
-set followers = 600
-where age = 16;
--- if there is an error try this
-set sql_safe_updates = 0;
+-- Insert after schema change
+INSERT INTO user (id, name, email, following) VALUES
+(5, "jim", "jim@hotmail.com", 100);
 
-select * from user;
+-- DROP & TRUNCATE
+DROP TABLE post;
+TRUNCATE TABLE user;
 
--- DELETE existing rows
-delete from user
-where age = 14;
-select * from user;
+-- ========================
+-- PRACTICE QUESTIONS
+-- ========================
 
+-- Q1: College Teacher Table
+CREATE DATABASE mycollege;
+USE mycollege;
 
--- Alter(change the schema(columns))
--- Add column
-alter table user 
-add column city varchar(20) default "mumbai";
-select * from user; 
-
--- Drop column
-alter table user
-drop age;
-select * from user;
-
--- rename table
-alter table user
-rename to instauser;
-select * from instauser;
-
-alter table instauser
-rename to user;
-select * from user;
-
--- rename columns
-Alter table user
-change column followers subs int default 0;
-select * from user;
-
--- modify column
-alter table user
-modify subs int default 5;
-select * from user;
--- inserting new data
-insert into user
-(id,name,email,following)
-values 
-(5,"jim","jim@hotmail.com",100);
-select * from user;
-
--- truncate
-drop table post;
-truncate table user;
-select * from user;
-
--- Practice qs
--- Create a database for your college 
--- create a table named teacher to store(id,anme,subject,salary)
-create database mycollege;
-use mycollege;
-create table Teacher(
-	id int,
-    name varchar(20),
-    subject varchar(10),
-    salary int
-); 
-insert into Teacher
-(id,name,subject,salary)
-values
-(23,"ajay","math",50000),
-(47,"bharat","english",60000),
-(18,"chetan","chemistry",45000),
-(23,"divya","physics",75000);
-
-select * from Teacher;
-
--- salary > 55k
-select * from Teacher
-where salary>=55000;
-
--- rename salary column to ctc
-alter table Teacher
-change column salary ctc int default 50000;
-
--- update salary as everyone got increment of 25 %
-update Teacher
-set ctc = ctc + (ctc*0.25);
-select * from Teacher;
-
--- add new column for teachers city (default Gurgaon)
-alter table Teacher
-add column city varchar(20) default "Gurgaon"; 
-select * from Teacher;
-
--- delete the salary column
-alter table Teacher
-Drop ctc;
-select * from Teacher;
-
-
--- practice q 2
---  create a table to store student info(rool_no,name,city,marks)
-create table student(
-	roll_no int,
-    name varchar(20),
-    city varchar(10),
-    marks int
+CREATE TABLE Teacher (
+    id INT,
+    name VARCHAR(20),
+    subject VARCHAR(10),
+    salary INT
 );
 
-insert into student
-(roll_no,name,city,marks)
-values
-(110,"adam","Delhi",76),
-(108,"bob","Mumbai",65),
-(124,"casey","Pune",94),
-(112,"duke","Pune",80);
+INSERT INTO Teacher VALUES
+(23, "ajay", "math", 50000),
+(47, "bharat", "english", 60000),
+(18, "chetan", "chemistry", 45000),
+(23, "divya", "physics", 75000); -- duplicate id for testing
 
--- all student marks > 75
-select name,marks 
-from student
-where marks>75;
+SELECT * FROM Teacher;
 
--- name of all cities where students are from
-select distinct city
-from student;
+-- Salary queries
+SELECT * FROM Teacher WHERE salary >= 55000;
 
-select city 
-from student
-group by city;
+-- Rename salary column to ctc
+ALTER TABLE Teacher CHANGE COLUMN salary ctc INT DEFAULT 50000;
 
--- max marks of students from each city
-select city,max(marks)
-from student
-group by city;
+-- Apply 25% hike
+UPDATE Teacher SET ctc = ctc + (ctc * 0.25);
 
--- avg of the class
-select avg(marks)
-from student;
+ALTER TABLE Teacher ADD COLUMN city VARCHAR(20) DEFAULT "Gurgaon";
 
--- new column grade 
--- marks > 80 , grade=O
--- marks70=80 , grade = A
--- marks 60-70, grade = begin
-alter table student
-add column grade varchar(2);
-update student
-set grade = "O"
-where marks>=80;
-update student
-set grade = "A"
-where marks between 70 and 80;
-update student
-set grade = "B"
-where marks between 60 and 70;
-select * from student
+ALTER TABLE Teacher DROP ctc;
 
+-- Q2: Student Table for Practice
+CREATE TABLE student (
+    roll_no INT,
+    name VARCHAR(20),
+    city VARCHAR(10),
+    marks INT
+);
+
+INSERT INTO student (roll_no, name, city, marks) VALUES
+(110, "adam", "Delhi", 76),
+(108, "bob", "Mumbai", 65),
+(124, "casey", "Pune", 94),
+(112, "duke", "Pune", 80);
+
+SELECT name, marks FROM student WHERE marks > 75;
+
+SELECT DISTINCT city FROM student;
+
+-- Max marks per city
+SELECT city, MAX(marks) FROM student GROUP BY city;
+
+-- Average marks
+SELECT AVG(marks) FROM student;
+
+-- Add Grade Column
+ALTER TABLE student ADD COLUMN grade VARCHAR(2);
+
+UPDATE student SET grade = "O" WHERE marks >= 80;
+UPDATE student SET grade = "A" WHERE marks BETWEEN 70 AND 80;
+UPDATE student SET grade = "B" WHERE marks BETWEEN 60 AND 70;
+
+SELECT * FROM student;
+
+-- ========================
+-- END OF SCRIPT
+-- ========================
